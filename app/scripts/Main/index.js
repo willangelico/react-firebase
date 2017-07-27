@@ -9,7 +9,8 @@ var Main = React.createClass({
 		return	{
 			data: [],
 			name: '',
-			age: ''
+			age: '',
+			key: ''
 		}
 	},
 	onChangeName: function(e){
@@ -25,16 +26,32 @@ var Main = React.createClass({
 	removeItem: function(key){
 		this.fireBaseRef.child(key).remove()
 	},
+	updateItem: function(key){
+		var self = this	
+		this.fireBaseRef.child(key).once('value').then(function(snapshot) {			
+		 	self.setState({
+				name: snapshot.val().name,
+				age: snapshot.val().age,
+				key: key
+			})
+		})		
+	},
 	handleSubmit: function(e){
 		e.preventDefault()
 		if(!this.state.name || !this.state.age){
 			alert('Please fill in the fields');
 		}
-		this.fireBaseRef.push({
-			name: this.state.name,
-			age: this.state.age
-		})
-
+		if(!this.state.key){
+			this.fireBaseRef.push({
+				name: this.state.name,
+				age: this.state.age
+			})	
+		}else{
+			this.fireBaseRef.child(this.state.key).update({
+				name: this.state.name,
+				age: this.state.age
+			})	
+		}
 		this.setState({
 			name: '',
 			age: ''
@@ -48,8 +65,9 @@ var Main = React.createClass({
 	render: function(){
 		return (
 			<div>
-				<h4>Create</h4>
+				
 				<div className="col-md-6">
+					<h4>Create</h4>
 					<form>
 						<div className="form-group">
 							<input type="text" value={this.state.name} onChange={this.onChangeName} className="form-control" placeholder="Name" />
@@ -63,7 +81,7 @@ var Main = React.createClass({
 					</form>
 				</div>
 				<div className="col-md-6">
-					<List items={this.state.data} removeItem={this.removeItem} />
+					<List items={this.state.data} removeItem={this.removeItem} updateItem={this.updateItem} />
 				</div>
 			</div>
 		)

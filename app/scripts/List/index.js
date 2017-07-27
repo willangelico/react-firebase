@@ -6,7 +6,7 @@ var List = React.createClass({
 		var create = function(item, index){			
 			return(
 				<tr key={ index }>
-					<td>
+					<td onClick={self.props.updateItem.bind(null, item['.key'])}>
 						{item.name}
 					</td>
 					<td>
